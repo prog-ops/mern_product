@@ -1,3 +1,19 @@
+body {
+  background-color: lightslategrey;
+}
+
+.component {
+  display: flex;
+  width: 90%;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+  padding: 2vw;
+  border-radius: 4px;
+  background-color: royalblue;
+}
+
 .App {
   text-align: center;
 }

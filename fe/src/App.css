@@ -2,15 +2,30 @@ body {
   background-color: lightslategrey;
 }
 
+img {
+  border-radius: 30%;
+  width: 35%;
+  height: 35%;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(25%, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
 .component {
   display: flex;
-  width: 90%;
+  width: 80%;
   height: auto;
   align-items: center;
   justify-content: center;
   margin-bottom: 40px;
+  margin-left: 20px;
+  margin-right: 20px;
   padding: 2vw;
-  border-radius: 4px;
+  border-radius: 7px;
   background-color: royalblue;
 }
 
@@ -51,4 +66,9 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.link {
+  color: #313d39;
+  text-decoration: none;
 }

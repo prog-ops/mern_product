@@ -51,18 +51,30 @@ export const addProduk = (req, res) => {
   file.mv(`./public/images/${fileName}`, async (error) => {
     if (error)
       return res.status(500).json({msg: error.message})
-    try {
-      await Produk.create({
-        name,
-        buy_price: buyPrice,
-        sell_price: sellPrice,
-        stock,
-        photo: fileName,
-        photo_url: url,
-      })
-      res.status(201).json({msg: "Produk berhasil ditambahkan."})
-    } catch (e) {
-      console.log(e.message)
+
+    // check if product with the same name already exists
+    const existingProduct = await Produk.findOne({
+      where: {
+        name
+      }
+    });
+    if (existingProduct) {
+      throw new Error('Product with the same name already exists');
+
+    } else {
+      try {
+        await Produk.create({
+          name,
+          buy_price: buyPrice,
+          sell_price: sellPrice,
+          stock,
+          photo: fileName,
+          photo_url: url,
+        })
+        res.status(201).json({msg: "Produk berhasil ditambahkan."})
+      } catch (e) {
+        console.log(e.message)
+      }
     }
   })
 }

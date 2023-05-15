@@ -1,23 +1,16 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
-import {URL} from '../const/constants'
+import {API_URL} from '../const/constants'
+import {Link} from "react-router-dom";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
-  const perPage = 10; // products per page
-
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    buy_price: '',
-    sell_price: '',
-    stock: '',
-    photo_url: ''
-  });
+  const perPage = 6; // products per page
 
   const getList = () => {
-    axios.get(URL)
+    axios.get(API_URL)
         .then(response => {
           setProducts(response.data);
         })
@@ -26,72 +19,38 @@ function ProductList() {
         });
   }
 
-  const handleAdd = () => {
-    axios.post(URL, newProduct)
-        .then(res => {
-          setProducts([...products, res.data]);
-          setNewProduct({
-            name: '',
-            buy_price: '',
-            sell_price: '',
-            stock: '',
-            photo_url: ''
-          });
-        })
-        .catch(err => {
-          console.log(err);
-        });
-  };
-
-  const handleChange = e => {
-    setNewProduct({
-      ...newProduct,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleDelete = id => {
-    axios.delete(`${URL}/${id}`)
-        .then(() => {
-          setProducts(products.filter(product => product.id !== id));
-        })
-        .catch(err => {
-          console.log(err);
-        });
-  };
-
-  const handleDeleteAll = () => {
-    axios.delete(URL)
-        .then(() => {
-          setProducts([]);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-  };
-
   useEffect(() => {
     getList()
   }, []);
 
+  const deleteProduk = useCallback(async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`)
+      getList()
+    } catch (e) {
+      console.log(e.message)
+    }
+  }, [])
+
+  const deleteProdukBefore = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`)
+      getList()
+    } catch (e) {
+      console.log(e.message)
+    }
+  }
+
+  const onDeleteClick = useCallback((id) => {
+    if (window.confirm(`Anda yakin ingin menghapus produk id: ${id}?`)) {
+      deleteProduk(id);
+    }
+    // alert('Hi')
+  }, [deleteProduk]);
+
   return (
       <>
         <h1>Product List</h1>
-
-        <div style={{marginBottom: '20px'}}>
-          <label>Name: </label>
-          <input type="text" name="name" value={newProduct.name} onChange={handleChange}/>
-          <label>Buy Price: </label>
-          <input type="text" name="buy_price" value={newProduct.buy_price} onChange={handleChange}/>
-          <label>Sell Price: </label>
-          <input type="text" name="sell_price" value={newProduct.sell_price} onChange={handleChange}/>
-          <label>Stock: </label>
-          <input type="text" name="stock" value={newProduct.stock} onChange={handleChange}/>
-          <label>Photo URL: </label>
-          <input type="text" name="photo_url" value={newProduct.photo_url} onChange={handleChange}/>
-          <button onClick={handleAdd}>Add Product</button>
-          <button onClick={handleDeleteAll}>Delete All</button>
-        </div>
 
         <input
             type="text"
@@ -101,11 +60,13 @@ function ProductList() {
         />
 
         <div style={{display:"flex", justifyContent: "space-evenly", marginBottom: '50px'}}>
-          <button onClick={() => setPage(page - 1)}>Previous Page</button>
-          <button onClick={() => setPage(page + 1)}>Next Page</button>
+          <button onClick={() => setPage(page - 1)}>⬅️ Previous Page</button>
+          <button onClick={() => setPage(page + 1)}>Next Page ➡️</button>
         </div>
 
-        <ul>
+        <Link to="/add" className='button is-success'>Add new produk</Link>
+
+        <div className='wrapper'>
           {products
               // .filter(product => {
               //   product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -114,20 +75,32 @@ function ProductList() {
               .map(product => (
                   <div className='component' key={product.id}>
                     <div style={{display: 'flex', flex: 1}}>
-                      <img style={{borderRadius: '30%', width: "25%", height: "25%",}}
+                      <img
                            src={product.photo_url}
-                           alt={product.name}/>
+                           alt={product.name}
+                      />
                     </div>
                     <div style={{display: "flex", flex: 1, flexDirection: "column"}}>
                       <h3>{product.name}</h3>
                       <span>Buy Price: {product.buy_price}</span>
                       <span>Sell Price: {product.sell_price}</span>
                       <span>Stock: {product.stock}</span>
+
+                      <div style={{display:"flex", justifyContent: "center", margin: '7px'}}>
+                        <button style={{padding: '7px', marginLeft: '10px', marginRight: '10px'}}>
+                          <Link to={`edit/${product.id}`} className='link'>Edit produk</Link>
+                          {/*<Link to={{
+                            pathname: `edit/${product.id}`,
+                            state: { product }
+                          }} className='link'>Edit produk</Link>*/}
+                        </button>
+                        <button style={{padding: '7px', marginLeft: '10px', marginRight: '10px'}} onClick={() => onDeleteClick(product.id)}>❌</button>
+                      </div>
                     </div>
                   </div>
               ))
           }
-        </ul>
+        </div>
       </>
   );
 }

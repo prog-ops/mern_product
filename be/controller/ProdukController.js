@@ -37,7 +37,7 @@ export const addProduk = (req, res) => {
   const file = req.files.file
   const fileSize = file.data.length
   const extension = path.extname(file.name)
-  const fileName = 'Gambar_' + file.md5 + extension
+  const fileName = /*'Gambar_' +*/ file.md5 + extension
   const url = `${req.protocol}://${req.get("host")}/images/${fileName}`
 
   // Check the type
@@ -84,7 +84,7 @@ export const editProduk = async (req, res) => {
     const file = req.files.file
     const size = file.data.length
     const extension = path.extname(file.name)
-    photo = 'Gambar_' + file.md5 + extension
+    photo = /*'Gambar_' +*/ file.md5 + extension
 
     if (!allowedType.includes(extension.toLowerCase()))
       return res.status(422).json({msg: "Tipe gambar tidak valid, hanya boleh JPG/JPEG dan PNG."})
